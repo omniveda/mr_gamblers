@@ -1,4 +1,3 @@
-
 import { useParams, useLocation } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { getCasinoById, getCasinoBySlug } from "../api/casinos";
@@ -215,7 +214,10 @@ const CasinoDetail = () => {
                   Currencies:{" "}
                 </p>
                 <span className="text-lg text-gray-300 inline">
-                  {casino.paymentInfo?.fees || "Not specified"}
+                  {safeJoin(
+                    casino.paymentInfo?.fees,
+                    "Not specified"
+                  )}
                 </span>
               </div>
             </div>
@@ -224,7 +226,7 @@ const CasinoDetail = () => {
 
       case "games":
         return (
-  <div className="flex flex-col items-center justify-center mt-4">
+          <div className="flex flex-col items-center justify-center mt-4">
     <div className="text-sm text-gray-100 w-full max-w-md">
       <div className="flex flex-col items-center space-y-3">
         <div className="w-full text-center">
@@ -241,20 +243,27 @@ const CasinoDetail = () => {
       </div>
     </div>
   </div>
-);
+        );
 
       case "responsible":
         return (
           <div className="space-y-4 text-sm text-gray-100 mt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-28 gap-4">
-              <div>
-                <p className="text-xl font-noodle inline text-white">Games:</p>
-                <span className="ml-1 text-lg">
-                  {safeJoin(casino.responsibleGaming?.tools, "Not specified")}
-                </span>
-              </div>
-              
-            </div>
+            <p className="text-xl text-white font-semibold">
+              Responsible Gaming Tools:
+            </p>
+            <ul className="list-disc list-inside grid grid-cols-1 md:grid-cols-2 gap-x-28 gap-y-2">
+              {casino.responsibleGaming?.tools?.length > 0 ? (
+                casino.responsibleGaming.tools.map((tool, index) => (
+                  <li key={index} className="text-lg text-gray-300">
+                    {tool}
+                  </li>
+                ))
+              ) : (
+                <li className="text-lg text-gray-300">
+                  No tools specified.
+                </li>
+              )}
+            </ul>
           </div>
         );
 

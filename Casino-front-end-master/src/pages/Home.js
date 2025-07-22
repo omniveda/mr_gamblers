@@ -14,7 +14,7 @@ import ExpertCard from "../components/ExpertCard";
 import { getCasinos } from "../api/casinos.js";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useRef } from "react";
-import certified from "../assets/images/Certified.png";
+
 import leftCircle from "../assets/images/lefteclipse.png";
 import rightCircle from "../assets/images/righteclipse.png";
 import GameIcon1 from "../assets/images/Game Icon.png";
@@ -34,6 +34,7 @@ import categoriesImg6 from "../assets/images/image 20.png";
 import CountryCasinoList from "../components/CountryCasinoList";
 
 import CookieConsent from "../components/CookieConsent";
+import Card2 from "../components/Card2.js";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -217,7 +218,7 @@ const Home = () => {
     setSlotFilteredData(filteredSlots.slice(0, 5));
     setBettingFilteredData(filteredBetting.slice(0, 5));
     sethotCasinos(filteredCertified.slice(0, 6));
-    setCertifiedCasinos(filteredCertified.slice(0, 4));
+    setCertifiedCasinos(filteredCertified.slice(0, 6));
     setRecentCasinos(sortedByDate.slice(0, 5));
   };
 
@@ -243,7 +244,7 @@ const categories = [
   };
 
   const [currentPage, setCurrentPage] = useState(1);
-  const casinosPerPage = 10;
+  const casinosPerPage = 25;
   const totalPages = Math.ceil(casinos.length / casinosPerPage);
   const indexOfLastCasino = currentPage * casinosPerPage;
   const indexOfFirstCasino = indexOfLastCasino - casinosPerPage;
@@ -626,11 +627,7 @@ const categories = [
             }}
           >
             <div className="flex flex-row sm:flex-row justify-center items-center text-center mb-10">
-              <img
-                src={certified}
-                alt="Certified"
-                className="w-12 h-12 sm:w-24 sm:h-24 sm:mr-4 mb-4 sm:mb-4"
-              />
+              
               <h2
                 className="text-3xl font-bold text-white mb-6 text-2xl md:text-4xl lg:text-5xl text-white"
                 style={{
@@ -646,9 +643,9 @@ const categories = [
             </div>
 
             <div className="flex justify-center items-center">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 m-10 mt-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 m-10 mt-5">
                 {certifiedCasinos.map((casino) => (
-                  <Card
+                  <Card2
                     key={casino._id}
                     name={casino.name}
                     rating={casino.rating}

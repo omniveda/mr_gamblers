@@ -2,8 +2,9 @@ import React from 'react';
 import footerbg from '../assets/images/footer-bg.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLinkedin, faFacebook, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons';
-import { faTelegram, faWhatsapp, faMicrosoft } from "@fortawesome/free-brands-svg-icons";
+import { faTelegram, faWhatsapp, faMicrosoft, faTeamspeak } from "@fortawesome/free-brands-svg-icons";
 import logo from '../assets/images/mr_logo.png';
+import teamsfav from '../assets/icon/teams-fav.png';
 
 import { faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
@@ -52,11 +53,12 @@ const Footer = () => {
           <div className="flex-1">
             <h3 className="font-bold text-lg mb-4">Links</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="hover:text-gray-300">Casino</a></li>
-              <li><a href="#" className="hover:text-gray-300">Bonus</a></li>
-              <li><a href="#" className="hover:text-gray-300">Games</a></li>
-              <li><a href="#" className="hover:text-gray-300">Betting</a></li>
-              <li><a href="#" className="hover:text-gray-300">Slots</a></li>
+              <li><a href="/casinos/crypto" className="hover:text-gray-300">Casino</a></li>
+              <li><a href="/bonuses/latest" className="hover:text-gray-300">Bonus</a></li>
+              <li><a href="/games/casino" className="hover:text-gray-300">Games</a></li>
+              <li><a href="/betting/sports" className="hover:text-gray-300">Betting</a></li>
+              <li><a href="/slots/video" className="hover:text-gray-300">Slots</a></li>
+              <li><a href='/sitemap' >Sitemap</a></li>
             </ul>
           </div>
 
@@ -87,15 +89,21 @@ const Footer = () => {
                 <FontAwesomeIcon icon={faEnvelope} /> support@mrgamblers.com
               </p>
               <p className="flex items-center gap-2 mt-2">
-                <FontAwesomeIcon icon={faPhone} /> +91-12345 67890
+                <FontAwesomeIcon icon={faPhone} /> +44 7537 105417
               </p>
             </div>
 
             <div className="flex space-x-6 text-2xl mb-6">
-              <a href="#" className="hover:opacity-80"><FontAwesomeIcon icon={faTelegram} /></a>
-              <a href="#" className="hover:opacity-80"><FontAwesomeIcon icon={faFacebook} /></a>
-              <a href="#" className="hover:opacity-80"><FontAwesomeIcon icon={faMicrosoft} /></a>
-              <a href="#" className="hover:opacity-80"><FontAwesomeIcon icon={faWhatsapp} /></a>
+              <a href="https://t.me/mrgamblers1983" className="hover:opacity-80"><FontAwesomeIcon icon={faTelegram} /></a>
+              <a href="https://teams.live.com/l/invite/FEAmyI2hoQYBndOKwM" className=" hover:opacity-80">
+                <img 
+                  src={teamsfav} 
+                  alt="Microsoft Teams" 
+                  className="w-8 h-8" 
+                  style={{ filter: 'brightness(0) invert(1)' }} 
+                />
+              </a>
+              <a href="https://wa.me/message/3X4XZMYD4ZPVI1" className="hover:opacity-80"><FontAwesomeIcon icon={faWhatsapp} /></a>
             </div>
 
             {/* <div className="space-y-1">
@@ -106,6 +114,20 @@ const Footer = () => {
         </div>
 
       </div>
+      <div className='w-full flex justify-center'>
+        <div className='border-t border-white w-[1100px] mx-auto'></div>
+      </div>
+      <div className='flex justify-center text-white text-sm py-5'>
+  <div className="flex items-center space-x-6">
+    <div>
+      © 2025 Mr Gamblers All rights reserved. Gambling can be addictive
+    </div>
+    <div className="border-l border-white h-5 mx-4"></div>
+    <div>
+      Powered By CyBite
+    </div>  
+  </div>
+</div>
     </footer>
   );
 };

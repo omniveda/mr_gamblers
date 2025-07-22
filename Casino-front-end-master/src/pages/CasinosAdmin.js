@@ -1,8 +1,6 @@
-
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCasinos, deleteCasino, updateCasino } from "../api/casinos";
+import { getAllCasinos, deleteCasino, updateCasino, setCasinoEnabled } from "../api/casinos";
 import Sidebar from "../components/Sidebar";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import Swal from 'sweetalert2';
@@ -17,7 +15,7 @@ const CasinosAdmin = () => {
   useEffect(() => {
     const fetchCasinos = async () => {
       try {
-        const data = await getCasinos();
+        const data = await getAllCasinos();
         const sortedCasinos = [...data].sort((a, b) => a.order - b.order);
         setCasinos(sortedCasinos);
       } catch (err) {
@@ -105,7 +103,7 @@ const CasinosAdmin = () => {
       await updateCasino(movedCasino._id, { order: newOrder });
 
       // Refresh the list from server to get final order values
-      const data = await getCasinos();
+      const data = await getAllCasinos();
       setCasinos(data.sort((a, b) => a.order - b.order));
     } catch (err) {
       setError(err.message || "Failed to update order");
@@ -165,6 +163,7 @@ const CasinosAdmin = () => {
                       <th className="p-3 text-left">Name</th>
                       <th className="p-3 text-left">Rating</th>
                       <th className="p-3 text-left">Actions</th>
+                      <th className="p-3 text-left">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -241,6 +240,22 @@ const CasinosAdmin = () => {
                                 disabled={isUpdating}
                               >
                                 Edit
+                              </button>
+                            </td>
+                            <td className="p-3">
+                              <button
+                                className={`px-3 py-1 rounded ${casino.enabled === 1 ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700'}`}
+                                onClick={async () => {
+                                  try {
+                                    await setCasinoEnabled(casino._id, casino.enabled === 1 ? 0 : 1);
+                                    setCasinos(casinos.map(c => c._id === casino._id ? { ...c, enabled: casino.enabled === 1 ? 0 : 1 } : c));
+                                  } catch (err) {
+                                    setError(err.message || "Failed to update status");
+                                  }
+                                }}
+                                disabled={isUpdating}
+                              >
+                                {casino.enabled === 1 ? 'Enabled' : 'Disabled'}
                               </button>
                             </td>
                           </tr>

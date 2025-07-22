@@ -1,5 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 
 const CasinoCard = ({
   id,
@@ -31,18 +33,21 @@ const CasinoCard = ({
           <div className="text-white text-2xl font-bold mr-4">{number}.</div>
 
           {/* Updated image size */}
-          <img
+          <LazyLoadImage
             src={image}
             alt={title}
             className="w-52 h-40 object-cover rounded-md"
+            effect="blur"
           />
 
           <div className="space-y-2 md:space-y-6 pl-0 md:pl-10">
             <p className="text-gray-400">
-              Deposit Bonus: <span className="block text-white">{depositBonus}</span>
+              Deposit Bonus:{" "}
+              <span className="block text-white">{depositBonus}</span>
             </p>
             <p className="text-gray-400">
-              Welcome Bonus: <span className="block text-white">{welcomeBonus}</span>
+              Welcome Bonus:{" "}
+              <span className="block text-white">{welcomeBonus}</span>
             </p>
           </div>
         </div>

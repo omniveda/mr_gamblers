@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Card from "./Card"; // adjust the import path as needed
-import { getCasinos } from "../api/casinos.js"; // Make sure to import your API function
+import Card from "./Card";
+import { getCasinos } from "../api/casinos.js";
+import globalIcon from "../assets/icon/global.png";
 
 const countries = [
    { name: "India", code: "in" },
@@ -18,13 +19,12 @@ const countries = [
   { name: "Switzerland", code: "ch" },
   { name: "United Kingdom (UK)", code: "gb" },
   { name: "European Countries (General)", code: "eu" },
- 
-
+  { name: "Global", code: "global" },
 ];
 
 const CountryCasinoList = () => {
-  const [selectedCountry, setSelectedCountry] = useState("India");
-  const [selectedCode, setSelectedCode] = useState("in");
+  const [selectedCountry, setSelectedCountry] = useState("Global");
+  const [selectedCode, setSelectedCode] = useState("global");
   const [allCasinos, setAllCasinos] = useState([]);
   const [filteredCasinos, setFilteredCasinos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,9 +110,9 @@ const CountryCasinoList = () => {
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10">
           <div className="flex items-center bg-white text-black px-4 py-2 rounded-md w-full sm:w-80">
             <img
-              src={`https://flagcdn.com/w40/${selectedCode}.png`}
+              src={selectedCountry === "Global" ? globalIcon : `https://flagcdn.com/w40/${selectedCode}.png`}
               alt="flag"
-              className="w-6 h-4 mr-2"
+              className="w-4 h-4 mr-2"
             />
             <select
               value={selectedCountry}

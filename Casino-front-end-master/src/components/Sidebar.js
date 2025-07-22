@@ -24,6 +24,7 @@ const Sidebar = () => {
       console.error("Failed to exit fullscreen:", err);
     }
   }
+  localStorage.removeItem("token");
   navigate("/"); // Redirect after fullscreen is exited
 };
 

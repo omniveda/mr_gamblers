@@ -7,10 +7,16 @@ import Card from "../components/Card";
 import ExpertCard from "../components/ExpertCard";
 import Footer from "../components/Footer";
 
+import classicslotsjson from '../allCasinoDetails/Slot/classicslots.json';
+import newslotsjson from '../allCasinoDetails/Slot/newslots.json';
+import progressiveslotsjson from '../allCasinoDetails/Slot/progressiveslots.json';
+import videoslotsjson from '../allCasinoDetails/Slot/videoslots.json';
+
 import slotBg from "../assets/images/slots-bg.png";
 import certified from "../assets/images/Certified.png";
 import leftCircle from "../assets/images/lefteclipse.png";
 import rightCircle from "../assets/images/righteclipse.png";
+import Card2 from "../components/Card2";
 
 
 const SLOT_TYPE_TAGS = {
@@ -21,11 +27,13 @@ const SLOT_TYPE_TAGS = {
 };
 
 const Slots = ({ type }) => {
+  const [cryptoData, setCryptoData] = useState(classicslotsjson);
   const [casinosData, setCasinosData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [hotSlots, setHotSlots] = useState([]);
   const [expertSlots, setExpertSlots] = useState([]);
   const [certifiedSlots, setCertifiedSlots] = useState([]);
+  const [activeSection,setActiveSection] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 const navigate = useNavigate();
@@ -37,10 +45,47 @@ const navigate = useNavigate();
   }, []);
 
   useEffect(() => {
+    if (type === "new") {
+      setCryptoData(newslotsjson);
+    } else if (type === "progressive") {
+      setCryptoData(progressiveslotsjson);
+    } else if (type === "classic") {
+      setCryptoData(classicslotsjson);
+    } else if (type === "video") {
+      setCryptoData(videoslotsjson);
+    }
+     else {
+      setCryptoData(newslotsjson);
+    }
+  }, [type]);
+
+  useEffect(() => {
+    if (!cryptoData || !cryptoData.overview || cryptoData.overview.length === 0) {
+      return;
+    }
+    const handleScroll = () => {
+      let current = cryptoData.overview[0]?.heading.replace(/\s+/g, '-').toLowerCase();
+      for (let item of cryptoData.overview) {
+        const id = item.heading.replace(/\s+/g, '-').toLowerCase();
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 100) {
+            current = id;
+          }
+        }
+      }
+      setActiveSection(current);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [cryptoData]);
+
+  useEffect(() => {
     const fetchSlots = async () => {
       setLoading(true);
       try {
-        const response = await API.get("/casinos");
+        const response = await API.get("/casinos", { params: { type } });
         setCasinosData(response.data);
         filterSlots(response.data);
       } catch (err) {
@@ -150,7 +195,7 @@ const navigate = useNavigate();
 
           <h2 className="text-3xl font-bold text-white mb-10 mt-40 text-2xl md:text-3xl lg:text-4xl">RECOMMENDED BY OUR EXPERTS</h2>
           <div className="flex justify-center items-center">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {expertSlots.slice(0, 6).map((casino, index) => (
                <Card key={index} name={casino.name} rating={casino.rating} bgImage={casino.logo} onClick={() => handlePlayClick(casino.name)} />
               ))}
@@ -163,13 +208,12 @@ const navigate = useNavigate();
         <div className="flex flex-col items-center">
           <div className="relative text-white p-10 w-full max-w-full" style={{ background: "linear-gradient(to right, #1A008E, #070028)" }}>
             <div className="flex flex-row justify-center items-center text-center mb-10">
-              <img src={certified} alt="Certified" className="w-12 h-12 sm:w-24 sm:h-24 sm:mr-4 mb-4 sm:mb-4" />
               <h2 className="text-3xl font-bold text-white mb-6 text-2xl md:text-4xl lg:text-5xl">Certified Slots</h2>
             </div>
             <div className="flex justify-center items-center">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 {certifiedSlots.slice(0, 6).map((casino, index) => (
-                  <Card key={index} name={casino.name} rating={casino.rating} bgImage={casino.logo} onClick={() => handlePlayClick(casino.name)} />
+                  <Card2 key={index} name={casino.name} rating={casino.rating} bgImage={casino.logo} onClick={() => handlePlayClick(casino.name)} />
                 ))}
               </div>
             </div>
@@ -191,6 +235,42 @@ const navigate = useNavigate();
           </div>
         </div>
       </section>
+
+      <section className="py-10 flex justify-center px-[20px]">
+          <aside className="w-1/4 p-6 hidden md:block sticky top-8 h-fit self-start">
+            <nav>
+              <h2 className="text-lg font-bold mb-4 text-white">Contents</h2>
+              <ul className="space-y-2 text-left text-white">
+                {cryptoData.overview.map((item, idx) => (
+                  <li
+                    key={item.heading}
+                    className={`cursor-pointer transition-colors hover:text-[red] ${activeSection === item.heading.replace(/\s+/g, '-').toLowerCase() ? "text-red-500  font-bold" : "text-white"}`}
+                    onClick={() => {
+                      const el = document.getElementById(item.heading.replace(/\s+/g, '-').toLowerCase());
+                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                  >
+                    {item.heading}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
+        <div className="flex w-full max-w-6xl text-[white] rounded-lg shadow-lg overflow-hidden">
+          {/* Main Content */}
+          <div className="w-full md:w-3/4 p-8 text-left text-[white]">
+            <h1 className="text-3xl font-bold mb-8 text-red-500">{cryptoData.title}</h1>
+            {cryptoData.overview.map((item, idx) => (
+              <div key={item.heading} className="mb-8">
+                <h2 id={item.heading.replace(/\s+/g, '-').toLowerCase()} className="text-2xl font-bold mb-2 text-red-400">
+                  {item.heading}
+                </h2>
+                <p className="text-lg whitespace-pre-line">{item.data}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>  
 
       <Footer />
     </>

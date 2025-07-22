@@ -71,3 +71,21 @@ export const getCasinoBySlug = async (slug) => {
     throw error.response?.data?.message || "Failed to fetch casino";
   }
 };
+
+export const setCasinoEnabled = async (id, enabled) => {
+  try {
+    const response = await API.patch(`/casinos/${id}/enabled`, { enabled });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || "Failed to update casino status";
+  }
+};
+
+export const getAllCasinos = async () => {
+  try {
+    const response = await API.get("/casinos?all=true");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || "Failed to fetch all casinos";
+  }
+};

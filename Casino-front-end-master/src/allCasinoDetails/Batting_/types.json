@@ -1,0 +1,41 @@
+{
+  "title": "Types of Sports Betting Explained: Your Complete Guide",
+  "overview": [
+    {
+      "heading": "",
+      "data": "With modern sportsbooks offering a wide variety of betting options, it's no longer just about predicting the winner. Understanding the different types of sports bets can significantly improve your decision-making, enhance your betting strategy, and help you identify value in less obvious markets.\nThis guide covers all major types of bets — from basic singles to complex combinations and sport-specific wagers."
+    },
+    {
+      "heading": "Why Knowing Bet Types Matters",
+      "data": "The more bet types you understand, the more strategic your choices can be. It allows you to:\n● Explore alternative markets for better value\n● Customize your betting to fit specific sports\n● Use specialized knowledge to gain an edge over bookmakers\nLet’s break down each major category of sports betting."
+    },
+    {
+      "heading": "Core Bet Types",
+      "data": "Single Bet\nA straightforward bet on one outcome. Examples include:\n● A football team to win a match\n● A tennis player to win a set\n● A golfer to finish first in a tournament\nThis is the most basic and widely used betting type.\nAccumulator (Acca)\nAn accumulator combines multiple selections into a single bet. All selections must win for the bet to succeed. For example:\n● Arsenal (2.0) + Tottenham (2.5) + Liverpool (1.5)\n● Total odds = 2.0 × 2.5 × 1.5 = 7.5\nLosing just one leg results in a lost bet.\nBet Builder\nSimilar to an accumulator, but all selections are within a single match. For example, in a football match:\n● Team A to win\n● Both teams to score\n● Over 4.5 cards\nAll selections must be correct for the bet to win."
+    },
+    {
+      "heading": "Combination and System Bets",
+      "data": "Trixie\nA bet involving 3 selections, generating 4 bets:\n● 3 doubles\n● 1 treble\nAt least two correct selections return a profit.\nPatent\nAlso uses 3 selections, but covers 7 bets:\n● 3 singles\n● 3 doubles\n● 1 treble\nEven one correct pick returns something.\nYankee\nUses 4 selections and includes 11 bets:\n● 6 doubles\n● 4 trebles\n● 1 four-fold\nSimilar bets with more selections include Lucky 15, Canadian, and Heinz."
+    },
+    {
+      "heading": "Region-Specific Bet Types",
+      "data": "Moneyline (Common in US Sports)\nBet on who wins a game. Used mostly in NFL, NBA, and MLB.\nExample:\n● Team A: -180 (You bet $180 to win $100)\n● Team B: +160 (You bet $100 to win $160)\nThis is equivalent to the “match odds” market in European betting.\nPoint Spread\nLevels the playing field by giving the underdog a point advantage.\nExample:\n● Team A: -4.5 points\n● Team B: +4.5 points\nYou win if your selection covers the spread."
+    },
+    {
+      "heading": "Advanced Bet Types",
+      "data": "Handicap Betting\nSimilar to point spreads but used globally in sports like football, tennis, rugby, and snooker.\nOne team is given a virtual advantage to balance the odds.\nOver/Under (Totals)\nBet on whether the total number of goals or points scored in a game is over or under a set number.\nExamples:\n● Football: Over/Under 2.5 goals\n● Basketball: Over/Under 180.5 points\n● NFL: Over/Under 45.5 points\nParlay\nThe US equivalent of an accumulator. All legs must win for the bet to pay out.\nTrixies, Patents, and Yankees are not parlays since they allow partial wins.\nFutures (Outright Bets)\nLong-term bets placed on season or tournament outcomes.\nExamples:\n● Premier League winner\n● Wimbledon champion\n● Super Bowl MVP\n● Presidential election winner"
+    },
+    {
+      "heading": "Entertainment and Prop Bets",
+      "data": "Prop Bets (Proposition Bets)\nWagers on individual events or player actions rather than the overall result.\nExamples:\n● First player to score\n● Number of yellow cards\n● Player to hit a century in cricket\nThese bets are especially popular for major events like the Super Bowl."
+    },
+    {
+      "heading": "Specialized US Bets",
+      "data": "If Bets\nA two-part conditional bet:\n● If Bet A wins, then Bet B is placed with the same stake.\n● If Bet A loses, Bet B is never placed.\nReverse Bets\nA combination of two If Bets placed in both orders. Requires placing two separate stakes.\nCan result in full, partial, or no returns depending on outcomes."
+    },
+    {
+      "heading": "Sport-Specific Betting Markets",
+      "data": "Correct Score\nUsed in low-scoring sports such as football or ice hockey. Predicts the exact final score (e.g. 2–1).\nInnings Runs (Cricket)\nPredict how many runs a team will score in a particular innings.\nFastest Lap (Motorsports)\nBet on which driver or rider records the fastest lap during a race.\nFirst Goalscorer / Try Scorer\nPredict which player will score the first goal in football or the first try in rugby.\nWinner Without (Golf/Horse Racing)\nExcludes the strong favourite from betting to let you bet on who will be the best among the rest."
+    }
+  ]
+}

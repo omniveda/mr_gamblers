@@ -1,5 +1,8 @@
 import React from "react";
 import crown from "../assets/images/crown.png";
+import globalIcon from "../assets/icon/global.png";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 
 const Card = ({ rating, bgImage, flagCode, onClick }) => {
   return (
@@ -13,13 +16,23 @@ const Card = ({ rating, bgImage, flagCode, onClick }) => {
         style={{ boxShadow: "inset 0 0 0 3px red" }}
       >
         {flagCode ? (
-          <img
-            src={`https://flagcdn.com/w40/${flagCode.toLowerCase()}.png`}
+          <LazyLoadImage
+            src={
+              flagCode === "global"
+                ? globalIcon
+                : `https://flagcdn.com/w40/${flagCode}.png`
+            }
             alt="Flag"
-            className="w-6 h-4 rounded-sm"
+            className="w-4 h-4 rounded-sm"
+            effect="blur"
           />
         ) : (
-          <img src={crown} alt="Crown" className="w-6 h-6" />
+          <LazyLoadImage
+            src={crown}
+            alt="Crown"
+            className="w-6 h-6"
+            effect="blur"
+          />
         )}
       </div>
 

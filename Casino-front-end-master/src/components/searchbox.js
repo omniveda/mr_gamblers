@@ -66,7 +66,7 @@ const SearchBox = () => {
         onChange={e => setQuery(e.target.value)}
         onFocus={() => setShowSuggestions(suggestions.length > 0)}
         onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
-        placeholder="Find over 10,000 casinos"
+        placeholder="Find over 1000 casinos"
         className="flex-1 basis-[70%] p-4 text-lg border-none outline-none rounded-l-2xl"
       />
       <button

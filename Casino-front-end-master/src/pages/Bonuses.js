@@ -12,8 +12,18 @@ import API from "../api/axios";
 import certified from '../assets/images/Certified.png';
 import Footer from "../components/Footer";
 
+import cashbackjson from '../allCasinoDetails/Bonus/cashback.json';
+import exclusivejson from '../allCasinoDetails/Bonus/exclusive.json';
+import freespinsjson from '../allCasinoDetails/Bonus/freespins.json';
+import latestjson from '../allCasinoDetails/Bonus/latest.json';
+import nodepositjson from '../allCasinoDetails/Bonus/no-deposit.json';
+import nowageringjson from '../allCasinoDetails/Bonus/no-wagering.json';
+import welcomejson from '../allCasinoDetails/Bonus/welcome.json';
+
 import leftCircle from "../assets/images/lefteclipse.png";
 import rightCircle from "../assets/images/righteclipse.png";
+import Card2 from "../components/Card2";
+
 const TYPE_TO_TAG_MAP = {
   'latest': 'Latest Bonus',
   'exclusive': 'Exclusive Bonus',
@@ -22,15 +32,24 @@ const TYPE_TO_TAG_MAP = {
   'freespins': 'Free Spins Bonus',
   'cashback': 'Cashback Bonus',
   'no-wagering': 'No Wagering Bonus',
-
-
 };
+
 const Bonuses = ({ type }) => {
+  const [cryptoData, setCryptoData] = useState(welcomejson);
   const [casinosData, setCasinosData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState('');
+  const [hotCasinos, setHotCasinos] = useState([]);
+  const [recommendedByExperts, setrecommendedByExperts] = useState([]);
+  const [certifiedCasinos, setcertifiedCasinos] = useState([]);
+  const navigate = useNavigate();
+
+  const handlePlayClick = (name) => {
+    navigate(`/casinos/${name.toLowerCase().replace(/\s+/g, "-")}`);
+  };
+
   useEffect(() => {
     document.body.style.backgroundColor = "#1e1e1e";
     return () => {
@@ -39,10 +58,90 @@ const navigate = useNavigate();
   }, []);
 
   useEffect(() => {
+    if (type === "welcome") {
+      setCryptoData(welcomejson);
+    } else if (type === "cashback") {
+      setCryptoData(cashbackjson);
+    } else if (type === "exclusive") {
+      setCryptoData(exclusivejson);
+    } else if (type === "freespins") {
+      setCryptoData(freespinsjson);
+    } else if (type === "latest") {
+      setCryptoData(latestjson);
+    } else if (type === "no-deposit") {
+      setCryptoData(nodepositjson);
+    } else if (type === "no-wagering") {
+      setCryptoData(nowageringjson);
+    } else {
+      setCryptoData(welcomejson);
+    }
+  }, [type]);
+
+  useEffect(() => {
+    if (!cryptoData || !cryptoData.overview || cryptoData.overview.length === 0) {
+      return;
+    }
+    const handleScroll = () => {
+      let current = cryptoData.overview[0]?.heading.replace(/\s+/g, '-').toLowerCase();
+      for (let item of cryptoData.overview) {
+        const id = item.heading.replace(/\s+/g, '-').toLowerCase();
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 100) {
+            current = id;
+          }
+        }
+      }
+      setActiveSection(current);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [cryptoData]);
+
+  const filterCasinos = (data) => {
+    if (!type || typeof type !== "string") {
+      setFilteredData(data);
+      setHotCasinos(data.filter(casino => casino.hotCasino === true));
+      setrecommendedByExperts(data.filter(casino => casino.recommendedByExperts === true));
+      setcertifiedCasinos(data.filter(casino => casino.certifiedCasino === true));
+      return;
+    }
+
+    const exactTag = TYPE_TO_TAG_MAP[type];
+    let tagFiltered = [];
+
+    if (!exactTag) {
+      const normalizedType = type.replace(/-/g, '').toLowerCase();
+      tagFiltered = data.filter(casino => {
+        if (!Array.isArray(casino.tags)) return false;
+        return casino.tags.some(tag => {
+          if (!tag) return false;
+          const normalizedTag = tag.replace(/-/g, '').toLowerCase();
+          return (
+            normalizedTag.includes(normalizedType) ||
+            normalizedType.includes(normalizedTag) ||
+            normalizedTag === normalizedType
+          );
+        });
+      });
+    } else {
+      tagFiltered = data.filter(
+        casino => Array.isArray(casino.tags) && casino.tags.includes(exactTag)
+      );
+    }
+
+    setFilteredData(tagFiltered);
+    setHotCasinos(tagFiltered.filter(casino => casino.hotCasino === true));
+    setrecommendedByExperts(tagFiltered.filter(casino => casino.recommendedByExperts === true));
+    setcertifiedCasinos(tagFiltered.filter(casino => casino.certifiedCasino === true));
+  };
+
+  useEffect(() => {
     const fetchCasinos = async () => {
       setLoading(true);
       try {
-        const response = await API.get("/casinos");
+        const response = await API.get("/casinos", { params: { type } });
         setCasinosData(response.data);
         filterCasinos(response.data);
       } catch (err) {
@@ -54,69 +153,6 @@ const navigate = useNavigate();
 
     fetchCasinos();
   }, [type]);
-
-   const handlePlayClick = (name) => {
-    navigate(`/casinos/${name.toLowerCase().replace(/\s+/g, "-")}`);
-  };
-const [hotCasinos, setHotCasinos] = useState([]);
-const [recommendedByExpertss, setrecommendedByExperts] = useState([]);
-const [certifiedCasinos, setcertifiedCasinos] = useState([]);
-
-const filterCasinos = (data) => {
-  // If no type is provided, show all casinos
-  if (!type || typeof type !== "string") {
-    setFilteredData(data);
-    setHotCasinos(data.filter(casino => casino.hotCasino === true));
-    setrecommendedByExperts(data.filter(casino => casino.recommendedByExperts === true));
-    setcertifiedCasinos(data.filter(casino => casino.certifiedCasino === true));
-    return;
-  }
-
-  // Get the exact tag from the mapping
-  const exactTag = TYPE_TO_TAG_MAP[type];
-
-  let tagFiltered = [];
-
-  // If no matching tag found, use flexible matching
-  if (!exactTag) {
-    const normalizedType = type.replace(/-/g, '').toLowerCase();
-
-    tagFiltered = data.filter(casino => {
-      if (!Array.isArray(casino.tags)) return false;
-
-      return casino.tags.some(tag => {
-        if (!tag) return false;
-
-        const normalizedTag = tag.replace(/-/g, '').toLowerCase();
-        return (
-          normalizedTag.includes(normalizedType) ||
-          normalizedType.includes(normalizedTag) ||
-          normalizedTag === normalizedType
-        );
-      });
-    });
-
-    console.log(`Filtered for flexible type "${type}":`, tagFiltered);
-  } else {
-    // Exact tag match
-    tagFiltered = data.filter(
-      casino => Array.isArray(casino.tags) && casino.tags.includes(exactTag)
-    );
-
-    console.log(`Filtered for exact type "${type}":`, tagFiltered);
-  }
-
-  // Set filtered data
-  setFilteredData(tagFiltered);
-
-  // Filter feature categories within the tag-matching data
-  setHotCasinos(tagFiltered.filter(casino => casino.hotCasino === true));
-  setrecommendedByExperts(tagFiltered.filter(casino => casino.recommendedByExperts === true));
-  setcertifiedCasinos(tagFiltered.filter(casino => casino.certifiedCasino === true));
-};
-
-
-
 
   return (
     <>
@@ -205,13 +241,13 @@ const filterCasinos = (data) => {
           </h2>
 
           <div className="flex justify-center items-center">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {loading ? (
                 <p>Loading...</p>
               ) : error ? (
                 <p>Error: {error}</p>
               ) : (
-                recommendedByExpertss.slice(0, 6).map((casino, index)=> (
+                recommendedByExperts.slice(0, 6).map((casino, index)=> (
                  <Card key={index} name={casino.name} rating={casino.rating} bgImage={casino.logo} onClick={() => handlePlayClick(casino.name)} />
                 ))
               )}
@@ -230,7 +266,7 @@ const filterCasinos = (data) => {
             }}
           >
             <div className="flex flex-row sm:flex-row justify-center items-center text-center mb-10">
-              <img src={certified} alt="Certified" className="w-12 h-12 sm:w-24 sm:h-24 sm:mr-4 mb-4 sm:mb-4" />
+              
               <h2 className="text-3xl font-bold text-white mb-6 text-2xl md:text-4xl lg:text-5xl text-white" style={{
                 fontFamily: 'BigNoodleTitling',
                 lineHeight: '1.2',
@@ -243,14 +279,14 @@ const filterCasinos = (data) => {
             <div className="flex justify-center items-center">
           
               <div className="flex justify-center items-center">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                   {loading ? (
                     <p>Loading...</p>
                   ) : error ? (
                     <p>Error: {error}</p>
                   ) : (
                     certifiedCasinos.slice(0, 6).map((casino, index) => (
-                     <Card key={index} name={casino.name} rating={casino.rating} bgImage={casino.logo} onClick={() => handlePlayClick(casino.name)} />
+                     <Card2 key={index} name={casino.name} rating={casino.rating} bgImage={casino.logo} onClick={() => handlePlayClick(casino.name)} />
                     ))
                   )}
                 </div>
@@ -302,7 +338,41 @@ const filterCasinos = (data) => {
 
 
 
-
+      <section className="py-10 flex justify-center px-[20px]">
+          <aside className="w-1/4 p-6 hidden md:block sticky top-8 h-fit self-start">
+            <nav>
+              <h2 className="text-lg font-bold mb-4 text-white">Contents</h2>
+              <ul className="space-y-2 text-left text-white">
+                {cryptoData.overview.map((item, idx) => (
+                  <li
+                    key={item.heading}
+                    className={`cursor-pointer transition-colors hover:text-[red] ${activeSection === item.heading.replace(/\s+/g, '-').toLowerCase() ? "text-red-500  font-bold" : "text-white"}`}
+                    onClick={() => {
+                      const el = document.getElementById(item.heading.replace(/\s+/g, '-').toLowerCase());
+                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                  >
+                    {item.heading}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
+        <div className="flex w-full max-w-6xl text-[white] rounded-lg shadow-lg overflow-hidden">
+          {/* Main Content */}
+          <div className="w-full md:w-3/4 p-8 text-left text-[white]">
+            <h1 className="text-3xl font-bold mb-8 text-red-500">{cryptoData.title}</h1>
+            {cryptoData.overview.map((item, idx) => (
+              <div key={item.heading} className="mb-8">
+                <h2 id={item.heading.replace(/\s+/g, '-').toLowerCase()} className="text-2xl font-bold mb-2 text-red-400">
+                  {item.heading}
+                </h2>
+                <p className="text-lg whitespace-pre-line">{item.data}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>           
       <Footer />
     </>
   );

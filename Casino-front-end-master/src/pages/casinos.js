@@ -21,6 +21,13 @@ import Footer from "../components/Footer";
 import leftCircle from "../assets/images/lefteclipse.png";
 import rightCircle from "../assets/images/righteclipse.png";
 
+import cryptojson from '../allCasinoDetails/Casino/crypto.json';
+import certifiedjson from '../allCasinoDetails/Casino/certified.json';
+import mobilejson from '../allCasinoDetails/Casino/mobile.json';
+import newsetjson from '../allCasinoDetails/Casino/newest.json';
+import onlinejson from '../allCasinoDetails/Casino/online.json';
+import Card2 from "../components/Card2";
+
 const sectionIds = [
   "what-is-mobile-casino",
   "how-we-rank",
@@ -48,11 +55,12 @@ const sectionTitles = [
 ];
 
 const Casinos = ({ type }) => {
-  const [casinosData, setCasinosData] = useState([]);
+  const [cryptoData, setCryptoData] = useState(cryptojson);
+  const [casinoData, setCasinosData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState(sectionIds[0]);
+  const [activeSection, setActiveSection] = useState(null);
 
   useEffect(() => {
     document.body.style.backgroundColor = "#1e1e1e";
@@ -65,7 +73,7 @@ const Casinos = ({ type }) => {
     const fetchCasinos = async () => {
       setLoading(true);
       try {
-        const response = await API.get("/casinos");
+        const response = await API.get("/casinos", { params: { type } });
         setCasinosData(response.data);
         filt(response.data);
       } catch (err) {
@@ -76,6 +84,22 @@ const Casinos = ({ type }) => {
     };
 
     fetchCasinos();
+  }, [type]);
+
+  useEffect(() => {
+    if (type === "crypto") {
+      setCryptoData(cryptojson);
+    } else if (type === "online") {
+      setCryptoData(onlinejson);
+    } else if (type === "certified") {
+      setCryptoData(certifiedjson);
+    } else if (type === "mobile") {
+      setCryptoData(mobilejson);
+    } else if (type === "newest") {
+      setCryptoData(newsetjson);
+    } else {
+      setCryptoData(cryptojson);
+    }
   }, [type]);
   
   const handlePlayClick = (name) => {
@@ -109,9 +133,13 @@ const Casinos = ({ type }) => {
   }
 
   useEffect(() => {
+    if (!cryptoData || !cryptoData.overview || cryptoData.overview.length === 0) {
+      return;
+    }
     const handleScroll = () => {
-      let current = sectionIds[0];
-      for (let id of sectionIds) {
+      let current = cryptoData.overview[0]?.heading.replace(/\s+/g, '-').toLowerCase();
+      for (let item of cryptoData.overview) {
+        const id = item.heading.replace(/\s+/g, '-').toLowerCase();
         const el = document.getElementById(id);
         if (el) {
           const rect = el.getBoundingClientRect();
@@ -124,7 +152,7 @@ const Casinos = ({ type }) => {
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [cryptoData]);
 
   const categories = [
     { icon: categoriesImg1, label: 'Casino Review' },
@@ -244,7 +272,7 @@ const Casinos = ({ type }) => {
           </h2>
 
           <div className="flex justify-center items-center">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {loading ? (
                 <p>Loading...</p>
               ) : error ? (
@@ -269,7 +297,6 @@ const Casinos = ({ type }) => {
             }}
           >
             <div className="flex flex-row sm:flex-row justify-center items-center text-center mb-10">
-              <img src={certified} alt="Certified" className="w-12 h-12 sm:w-24 sm:h-24 sm:mr-4 mb-4 sm:mb-4" />
               <h2 className="text-3xl font-bold text-white mb-6 text-2xl md:text-4xl lg:text-5xl text-white" style={{
                 fontFamily: 'BigNoodleTitling',
                 lineHeight: '1.2',
@@ -282,14 +309,14 @@ const Casinos = ({ type }) => {
             <div className="flex justify-center items-center">
 
               <div className="flex justify-center items-center">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                   {loading ? (
                     <p>Loading...</p>
                   ) : error ? (
                     <p>Error: {error}</p>
                   ) : (
                     certifiedCasinos.slice(0, 6).map((casino, index) => (
-                     <Card key={index} name={casino.name} rating={casino.rating} bgImage={casino.logo} onClick={() => handlePlayClick(casino.name)} />
+                     <Card2 key={index} name={casino.name} rating={casino.rating} bgImage={casino.logo} onClick={() => handlePlayClick(casino.name)} />
                     ))
                   )}
                 </div>
@@ -348,58 +375,34 @@ const Casinos = ({ type }) => {
           <aside className="w-1/4 p-6 hidden md:block sticky top-8 h-fit self-start">
             <nav>
               <h2 className="text-lg font-bold mb-4 text-white">Contents</h2>
-              <ul className="space-y-2 text-left">
-                {sectionIds.map((id, idx) => (
+              <ul className="space-y-2 text-left text-white">
+                {cryptoData.overview.map((item, idx) => (
                   <li
-                    key={id}
-                    className={`cursor-pointer transition-colors hover:text-blue-400 ${activeSection === id ? "text-red-500  font-bold" : "text-white"}`}
+                    key={item.heading}
+                    className={`cursor-pointer transition-colors hover:text-[red] ${activeSection === item.heading.replace(/\s+/g, '-').toLowerCase() ? "text-red-500  font-bold" : "text-white"}`}
                     onClick={() => {
-                      const el = document.getElementById(id);
+                      const el = document.getElementById(item.heading.replace(/\s+/g, '-').toLowerCase());
                       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
                     }}
                   >
-                    {sectionTitles[idx]}
+                    {item.heading}
                   </li>
                 ))}
               </ul>
             </nav>
           </aside>
         <div className="flex w-full max-w-6xl text-[white] rounded-lg shadow-lg overflow-hidden">
-          {/* Sidebar */}
           {/* Main Content */}
           <div className="w-full md:w-3/4 p-8 text-left text-[white]">
-            <h1 id="what-is-mobile-casino" className="text-3xl font-bold mb-4 text-red-500">What Is a Mobile Casino?</h1>
-            <p className="mb-6">
-              A mobile casino is a web-based gambling site offering casino games of chance and skill for real on remote devices, including mobile phones, tablets, and smartphones. In other words, any online casino with a mobile version of its website where you can register and play mobile casino games is considered a phone casino.
-              <br /><br />
-              Since the introduction of the first-ever mobile casino in 2004, players were no longer restricted to their computers and could take their favourite games with them anywhere they went. These casino sites are optimised to work seamlessly on remote devices, with software compatible with iOS and Android platforms and, in some instances, Blackberry.
-            </p>
-            <h1 id="how-we-rank" className="text-2xl font-bold mb-2 text-red-500">How We Rank the Best Mobile Casino Sites</h1>
-            <p>
-              To bring you closer to the best mobile casinos, we employ CasinoRank, the industry-first automatic online casino ranking mechanism, followed by the word from our expert reviewers. Before we present our evaluation to players, we assess a set of criteria, and we try to do it consistently with every new mobile casino review:
-            </p>
-            <h3 id="licensing" className="text-xl font-semibold mt-6 mb-2">Licensing</h3>
-            <p className="mb-4">Holding player safety to the highest priority, we promote only legitimate mobile casino sites carrying valid licences from any of the reputable gambling authorities, such as the UK Gambling Commission (UKGC), Malta Gaming Authority (MGA), Swedish Gambling Authority, etc.</p>
-            <h3 id="interface" className="text-xl font-semibold mt-6 mb-2">Interface</h3>
-            <p className="mb-4">The design of each smartphone casino, its features, user-friendliness, and user experience are all part of the equation determining whether a casino is worthy of our players' time.</p>
-            <h3 id="software-providers" className="text-xl font-semibold mt-6 mb-2">Software Providers</h3>
-            <p className="mb-4">For many players, the variety of casino game providers is crucial in choosing the top mobile casinos for real money. Therefore, our casino reviewers try to filter phone casinos relying on gaming studios specialising in mobile gaming.</p>
-            <h3 id="payment-methods" className="text-xl font-semibold mt-6 mb-2">Payment Methods</h3>
-            <p className="mb-4">Available banking methods are another aspect of best mobile casino sites, with casino operators going above and beyond to offer as many deposit methods as possible. Every mobile gambling platform review underlines the available payment methods, deposit and withdrawal limits and other details concerning money handling.</p>
-            <h3 id="customer-support" className="text-xl font-semibold mt-6 mb-2">Customer Support</h3>
-            <p className="mb-4">Customer service availability is essential for a pleasant gaming experience, so we test all avenues to reach the customer support the casino claims to offer.</p>
-            <h3 id="mobile-optimisation" className="text-xl font-semibold mt-6 mb-2">Mobile Optimisation</h3>
-            <p className="mb-4">Naturally, to even be considered a mobile casino, an online gambling site must be fully optimised for mobile, so our reviewers look at how seamlessly the website works on various platforms, including Android and iOS.</p>
-            <h3 id="reputation" className="text-xl font-semibold mt-6 mb-2">Reputation</h3>
-            <p className="mb-4">When it comes to mobile casinos' reputation, we rely on player reviews. Each phone casino review on our website contains a player review section, where registered users leave comments and discuss different aspects of online casinos.</p>
-            <h1 id="are-mobile-casinos-safe" className="text-3xl font-bold mb-4 text-red-500">Are Mobile Casinos Safe?</h1>
-            <p className="mb-6">
-              Yes, it is perfectly safe to play at smartphone casinos as they use the latest security protocols to protect sensitive player data and utilise state-of-the-art technology to make transactions as secure as possible.
-              <br /><br />
-              Mobile casinos have even proven to be safer than online casinos. This is because platforms powering remote devices have better security than computers, minimising the chances of having your smartphone or tablet hacked.
-              <br /><br />
-              Also, the entire communication between your device and the casino occurs over an SSL-encrypted connection, keeping fraudsters away from your account and your withdrawals safe
-            </p>
+            <h1 className="text-3xl font-bold mb-8 text-red-500">{cryptoData.title}</h1>
+            {cryptoData.overview.map((item, idx) => (
+              <div key={item.heading} className="mb-8">
+                <h2 id={item.heading.replace(/\s+/g, '-').toLowerCase()} className="text-2xl font-bold mb-2 text-red-400">
+                  {item.heading}
+                </h2>
+                <p className="text-lg whitespace-pre-line">{item.data}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
