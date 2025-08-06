@@ -22,8 +22,6 @@ import GameIcon2 from "../assets/images/Game Icon (1).png";
 import GameIcon3 from "../assets/images/Game Icon (2).png";
 import GameIcon4 from "../assets/images/Game Icon (3).png";
 
-
-
 // Category images
 import categoriesImg1 from "../assets/images/image15.png";
 import categoriesImg2 from "../assets/images/image 16.png";
@@ -52,9 +50,6 @@ const Home = () => {
   const [certifiedCasinos, setCertifiedCasinos] = useState([]);
   const [hotCasinos, sethotCasinos] = useState([]);
   const [recentCasinos, setRecentCasinos] = useState([]);
- 
-
-
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -231,10 +226,6 @@ const categories = [
   { icon: categoriesImg6, label: "Instant Play", link: "/games/lottery" }, // Create this route if needed
 ];
 
-
-
- 
-
   const handlePlayClick = (name) => {
     navigate(`/casinos/${name.toLowerCase().replace(/\s+/g, "-")}`);
   };
@@ -279,8 +270,6 @@ const categories = [
         return casinoFilteredData;
     }
   };
-  const cards = getCurrentSectionData(); // Now it's safe to use
-  const isScrollable = cards.length >= 6;
 
   if (loading) {
     return (
@@ -340,8 +329,6 @@ const categories = [
           </div>
           <CardAnimation />
         </div>
-
-
       </header>
 
       <section className="py-10 bg-black100 text-center">
@@ -417,7 +404,6 @@ const categories = [
             </button>
           </div>
         </div>
-
 
          <div className="flex justify-center items-center">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 m-10 mt-5">

@@ -9,16 +9,20 @@
   <body>
     <div id="root"></div>
     <!-- This is where your React app will be injected -->
-    <!-- Start of Tawk.to Script -->
+    <!-- Start of Tawk.to Script - OPTIMIZED -->
     <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
     var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
     s1.async=true;
+    s1.defer=true; // Add defer for better performance
     s1.src='https://embed.tawk.to/687cce91d6919b1917ede331/1j0jodqv2';
     s1.charset='UTF-8';
     s1.setAttribute('crossorigin','*');
-    s0.parentNode.insertBefore(s1,s0);
+    // Load Tawk.to after page is fully loaded
+    window.addEventListener('load', function() {
+      s0.parentNode.insertBefore(s1,s0);
+    });
     })();
     </script>
     <!-- End of Tawk.to Script -->

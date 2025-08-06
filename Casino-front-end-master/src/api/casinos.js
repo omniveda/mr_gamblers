@@ -1,16 +1,16 @@
 import API from "./axios";
 
+// Get all casinos - OPTIMIZED VERSION
 export const getCasinos = async () => {
   try {
-    const response = await API.get("/casinos");
+    // Request only the data needed for homepage with limit
+    const response = await API.get("/casinos", {
+      params: { 
+        limit: 50 // Limit to 50 casinos for homepage
+      }
+    });
     return response.data;
   } catch (error) {
-    if (error.message.includes("ERR_BLOCKED_BY_CLIENT")) {
-      // Show user-friendly message about disabling ad blocker
-      throw new Error(
-        "Our API request was blocked by your browser extension. Please disable ad blockers for this site."
-      );
-    }
     throw error.response?.data?.message || "Failed to fetch casinos";
   }
 };

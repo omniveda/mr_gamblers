@@ -88,7 +88,7 @@ const CasinosAdmin = () => {
       const [movedCasino] = newCasinos.splice(result.source.index, 1);
       newCasinos.splice(result.destination.index, 0, movedCasino);
 
-      // Get the new order value from the destination index
+      // Get the new order value as the new position in the list (1-based)
       const newOrder = result.destination.index + 1;
 
       // Optimistic UI update with actual order values
