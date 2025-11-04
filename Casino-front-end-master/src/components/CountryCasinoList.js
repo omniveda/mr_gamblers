@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Card from "./Card";
 import { getCasinos } from "../api/casinos.js";
 import globalIcon from "../assets/icon/global.png";
+import { useNavigate } from "react-router-dom";
+import CardSkeleton from "./CardSkeleton.js";
 
 const countries = [
    { name: "India", code: "in" },
@@ -23,12 +25,17 @@ const countries = [
 ];
 
 const CountryCasinoList = () => {
+  const navigate = useNavigate();
   const [selectedCountry, setSelectedCountry] = useState("Global");
   const [selectedCode, setSelectedCode] = useState("global");
   const [allCasinos, setAllCasinos] = useState([]);
   const [filteredCasinos, setFilteredCasinos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const casinosPerPage = 25;
 
   // Fetch all casinos on component mount
   useEffect(() => {
@@ -49,6 +56,15 @@ const CountryCasinoList = () => {
     fetchCasinos();
   }, []);
 
+  const handlePlayClick = (name, isNewTab = false) => {
+    const path = `/casinos/${name.toLowerCase().replace(/\s+/g, "-")}`;
+    if (isNewTab) {
+      window.open(path, '_blank');
+    } else {
+      navigate(path);
+    }
+  };
+
   // Filter casinos by selected country
   const filterCasinosByCountry = (casinos, country) => {
     // If "Global" is selected, show all casinos
@@ -64,6 +80,8 @@ const CountryCasinoList = () => {
     );
 
     setFilteredCasinos(filtered);
+    // Reset to first page when filtering
+    setCurrentPage(1);
   };
 
   const handleCountryChange = (e) => {
@@ -75,6 +93,28 @@ const CountryCasinoList = () => {
 
     // Filter casinos based on newly selected country
     filterCasinosByCountry(allCasinos, selected.name);
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredCasinos.length / casinosPerPage);
+  const startIndex = (currentPage - 1) * casinosPerPage;
+  const endIndex = startIndex + casinosPerPage;
+  const currentCasinos = filteredCasinos.slice(startIndex, endIndex);
+
+  const goToPage = (page) => {
+    setCurrentPage(page);
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
   // Show a loading message while fetching data
@@ -118,6 +158,7 @@ const CountryCasinoList = () => {
               value={selectedCountry}
               onChange={handleCountryChange}
               className="bg-transparent outline-none w-full text-black"
+              aria-label="Select country to filter casinos"
             >
               {countries.map((country) => (
                 <option key={country.code} value={country.name}>
@@ -129,22 +170,61 @@ const CountryCasinoList = () => {
         </div>
 
         {/* Casino Grid using Card Component */}
-        {filteredCasinos.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-center place-items-center">
+        {loading
+      ? Array.from({ length: 5 }).map((_, idx) => <CardSkeleton key={idx} />):filteredCasinos.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-center place-items-center mb-8">
+              {currentCasinos.map((casino) => {
+                // Create a URL-friendly slug from the casino name
+                const slug = casino.name
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^\w-]/g, "");
+                
+                return (
+                  <Card
+                    key={casino._id}
+                    name={casino.name}
+                    rating={casino.rating}
+                    bgImage={casino.logo}
+                    flagCode={selectedCode}
+                    onClick={(isNewTab) => handlePlayClick(casino.name,isNewTab)}
+                  />
+                );
+              })}
+            </div>
 
-            {filteredCasinos.map((casino) => (
-              <Card
-                key={casino._id}
-                name={casino.name}
-                rating={casino.rating}
-                bgImage={casino.logo}
-                flagCode={selectedCode}
-                onClick={() =>
-                  (window.location.href = `/casinos/${casino.slug}`)
-                }
-              />
-            ))}
-          </div>
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-4 mt-8">
+                <button
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                  className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                  aria-label="Previous page"
+                >
+                  <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                
+                <span className="text-white text-lg">
+                  Page {currentPage} of {totalPages}
+                </span>
+                
+                <button
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                  className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                  aria-label="Next page"
+                >
+                  <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-8">
             <p className="text-xl text-gray-300">

@@ -8,6 +8,7 @@ const CasinoCard = ({
   image,
   title,
   depositBonus,
+  editorView,
   welcomeBonus,
   rating,
   visits,
@@ -76,9 +77,16 @@ const CasinoCard = ({
         <div className="casino-stats flex flex-col items-center md:items-end text-center md:text-right space-y-4 mt-4 lg:mt-5 md:mt-0">
           <p className="text-gray-400">{visits} Has Already Visited!</p>
           <Link
-            to={`/casinos/${slug}`}
+            to={editorView}
             state={{ casinoId: id }}
             className="bg-red-600 hover:bg-red-800 text-white px-12 py-2 md:px-16 md:py-3 rounded-lg text-center"
+            onClick={(e) => {
+              if (e.ctrlKey || e.metaKey) {
+                // If Control or Command key is pressed, open in new tab
+                e.preventDefault();
+                window.open(editorView, '_blank');
+              }
+            }}
           >
             Play now
           </Link>

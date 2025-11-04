@@ -1,17 +1,67 @@
 import API from "./axios";
+import { retryWithBackoff, getCachedCasinoData, setCachedCasinoData } from "../utils/apiUtils";
 
-// Get all casinos - OPTIMIZED VERSION
-export const getCasinos = async () => {
-  try {
-    // Request only the data needed for homepage with limit
+// Get all casinos - OPTIMIZED VERSION with retry and caching
+export const getCasinos = async (useCache = true) => {
+  // Try to get cached data first if enabled
+  if (useCache) {
+    const cachedData = getCachedCasinoData();
+    if (cachedData) {
+      // Return cached data but also try to refresh in background
+      refreshCacheInBackground();
+      return cachedData;
+    }
+  }
+
+  // Fetch fresh data with retry logic
+  const fetchCasinos = async () => {
     const response = await API.get("/casinos", {
-      params: { 
-        limit: 50 // Limit to 50 casinos for homepage
-      }
+      params: {
+        limit: 80 // Limit to 80 casinos for homepage
+      },
+      timeout: 10000 // 10 second timeout
     });
     return response.data;
+  };
+
+  try {
+    const data = await retryWithBackoff(fetchCasinos, 3, 1000);
+
+    // Cache the successful response
+    if (useCache) {
+      setCachedCasinoData(data);
+    }
+
+    return data;
   } catch (error) {
-    throw error.response?.data?.message || "Failed to fetch casinos";
+    // If we have cached data as fallback, use it
+    if (useCache) {
+      const cachedData = getCachedCasinoData();
+      if (cachedData) {
+        console.warn('Using cached casino data due to API failure');
+        return cachedData;
+      }
+    }
+
+    throw error;
+  }
+};
+
+// Background cache refresh function
+const refreshCacheInBackground = async () => {
+  try {
+    const fetchCasinos = async () => {
+      const response = await API.get("/casinos", {
+        params: { limit: 80 },
+        timeout: 10000
+      });
+      return response.data;
+    };
+
+    const data = await retryWithBackoff(fetchCasinos, 2, 1000);
+    setCachedCasinoData(data);
+  } catch (error) {
+    console.warn('Background cache refresh failed:', error.message);
   }
 };
 

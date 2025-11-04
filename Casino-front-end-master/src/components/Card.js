@@ -5,10 +5,28 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 
 const Card = ({ rating, bgImage, flagCode, onClick }) => {
+  const handleClick = (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      // If Control or Command key is pressed, prevent default and handle new tab
+      e.preventDefault();
+      e.stopPropagation();
+      // For Card component, we need to handle this differently since it doesn't have a direct URL
+      // We'll assume the onClick handler can handle this case
+      if (onClick) {
+        onClick(true); // Pass true to indicate new tab
+      }
+    } else {
+      // Normal click behavior
+      if (onClick) {
+        onClick(false);
+      }
+    }
+  };
+
   return (
     <div
       className="relative bg-white rounded-3xl shadow-lg w-48 transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl cursor-pointer"
-      onClick={onClick}
+      onClick={handleClick}
     >
       {/* Flag or fallback crown inside circle */}
       <div

@@ -94,16 +94,16 @@ const Footer = () => {
             </div>
 
             <div className="flex space-x-6 text-2xl mb-6">
-              <a href="https://t.me/mrgamblers1983" className="hover:opacity-80"><FontAwesomeIcon icon={faTelegram} /></a>
-              <a href="https://teams.live.com/l/invite/FEAmyI2hoQYBndOKwM" className=" hover:opacity-80">
-                <img 
-                  src={teamsfav} 
-                  alt="Microsoft Teams" 
-                  className="w-8 h-8" 
-                  style={{ filter: 'brightness(0) invert(1)' }} 
+              <a href="https://t.me/mrgamblers1983" className="hover:opacity-80" aria-label="Contact us on Telegram"><FontAwesomeIcon icon={faTelegram} /></a>
+              <a href="https://teams.live.com/l/invite/FEAmyI2hoQYBndOKwM" className=" hover:opacity-80" aria-label="Join our Microsoft Teams">
+                <img
+                  src={teamsfav}
+                  alt="Microsoft Teams"
+                  className="w-8 h-8"
+                  style={{ filter: 'brightness(0) invert(1)' }}
                 />
               </a>
-              <a href="https://wa.me/message/3X4XZMYD4ZPVI1" className="hover:opacity-80"><FontAwesomeIcon icon={faWhatsapp} /></a>
+              <a href="https://wa.me/message/3X4XZMYD4ZPVI1" className="hover:opacity-80" aria-label="Contact us on WhatsApp"><FontAwesomeIcon icon={faWhatsapp} /></a>
             </div>
 
             {/* <div className="space-y-1">

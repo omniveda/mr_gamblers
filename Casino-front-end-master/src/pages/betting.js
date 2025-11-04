@@ -101,8 +101,13 @@ const Betting = ({ type }) => {
 
         fetchBettingSites();
     }, [type]);
- const handlePlayClick = (name) => {
-    navigate(`/casinos/${name.toLowerCase().replace(/\s+/g, "-")}`);
+const handlePlayClick = (name, isNewTab = false) => {
+    const path = `/casinos/${name.toLowerCase().replace(/\s+/g, "-")}`;
+    if (isNewTab) {
+      window.open(path, '_blank');
+    } else {
+      navigate(path);
+    }
   };
     const filterDataByType = (data) => {
         const tag = BETTING_TYPE_TAGS[type];
@@ -141,7 +146,8 @@ const Betting = ({ type }) => {
                             <p className="text-red-500">Error: {error}</p>
                         ) : (
                             filteredData.slice(0, 5).map((item, index) => (
-                                <Card key={index} name={item.name} rating={item.rating} bgImage={item.logo} onClick={() => handlePlayClick(item.name)} />
+                                <Card key={index} name={item.name} rating={item.rating} bgImage={item.logo}  onClick={(isNewTab) => handlePlayClick(item.name,isNewTab)}
+/>
                             ))
                         )}
                     </div>
@@ -164,7 +170,8 @@ const Betting = ({ type }) => {
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8 w-full">
                             {hot.slice(0, 4).map((item, index) => (
 
-                                <ExpertCard key={index} bgImage={item.logo} name={item.name} onClick={() => handlePlayClick(item.name)} />
+                                <ExpertCard key={index} bgImage={item.logo} name={item.name}   onClick={(isNewTab) => handlePlayClick(item.name,isNewTab)}
+/>
                             ))}
                         </div>
                     </div>
@@ -173,7 +180,8 @@ const Betting = ({ type }) => {
                     <div className="flex justify-center items-center">
                         <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                             {expert.slice(0, 6).map((item, index) => (
-                                <ExpertCard key={index} logo={item.logo} name={item.name} onClick={() => handlePlayClick(item.name)} />
+                                <ExpertCard key={index} logo={item.logo} name={item.name}   onClick={(isNewTab) => handlePlayClick(item.name,isNewTab)}
+/>
                             ))}
                         </div>
                     </div>
@@ -189,7 +197,8 @@ const Betting = ({ type }) => {
                         <div className="flex justify-center items-center">
                             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                                 {certifiedData.slice(0, 6).map((item, index) => (
-                                    <ExpertCard key={index} logo={item.logo} name={item.name} onClick={() => handlePlayClick(item.name)}/>
+                                    <ExpertCard key={index} logo={item.logo} name={item.name}   onClick={(isNewTab) => handlePlayClick(item.name,isNewTab)}
+/>
                                 ))}
                             </div>
                         </div>
@@ -204,7 +213,8 @@ const Betting = ({ type }) => {
                         <div className="flex justify-center items-center">
                             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-8">
                                 {filteredData.slice(0, 6).map((casino, index) => (
-                                    <Card key={index} name={casino.name} rating={casino.rating} bgImage={casino.logo}/>
+                                    <Card key={index} name={casino.name} rating={casino.rating} bgImage={casino.logo}   onClick={(isNewTab) => handlePlayClick(casino.name,isNewTab)}
+/>
                                 ))}
                             </div>
                         </div>

@@ -9,6 +9,7 @@ const CasinosAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   // Fetch casinos sorted by order
@@ -26,6 +27,20 @@ const CasinosAdmin = () => {
     };
     fetchCasinos();
   }, []);
+
+  // Filter casinos based on search term
+  const filteredCasinos = casinos.filter(casino =>
+    casino.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handlePlayClick = (isNewTab = false) => {
+    const path = "/create-casino";
+    if (isNewTab) {
+      window.open(path, '_blank');
+    } else {
+      navigate(path);
+    }
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -88,7 +103,7 @@ const CasinosAdmin = () => {
       const [movedCasino] = newCasinos.splice(result.source.index, 1);
       newCasinos.splice(result.destination.index, 0, movedCasino);
 
-      // Get the new order value as the new position in the list (1-based)
+      // Get the new order value from the destination index
       const newOrder = result.destination.index + 1;
 
       // Optimistic UI update with actual order values
@@ -138,9 +153,44 @@ const CasinosAdmin = () => {
       <Sidebar />
       <div className="flex-1 p-6">
         <h2 className="text-2xl font-bold mb-6">Manage Casinos</h2>
+        
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search casinos by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg
+                className="h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+          </div>
+          {searchTerm && (
+            <div className="mt-2 text-sm text-gray-600">
+              Found {filteredCasinos.length} casino{filteredCasinos.length !== 1 ? 's' : ''} matching "{searchTerm}"
+            </div>
+          )}
+        </div>
+
         <button
           className="bg-green-500 text-white px-4 py-2 rounded mb-4 hover:bg-green-600 transition"
-          onClick={() => navigate("/create-casino")}
+          // onClick={() => navigate("/create-casino")}
+            onClick={(isNewTab) => handlePlayClick(isNewTab)}
           disabled={isUpdating}
         >
           {isUpdating ? "Updating..." : "Create Casino"}
@@ -167,7 +217,7 @@ const CasinosAdmin = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {casinos.map((casino, index) => (
+                    {filteredCasinos.map((casino, index) => (
                       <Draggable
                         key={casino._id}
                         draggableId={casino._id}

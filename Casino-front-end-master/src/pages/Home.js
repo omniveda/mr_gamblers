@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import CardAnimation from "../components/CardAnimation.js";
@@ -12,8 +12,9 @@ import CategoryCard from "../components/CategoryCard";
 
 import ExpertCard from "../components/ExpertCard";
 import { getCasinos } from "../api/casinos.js";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { useRef } from "react";
+import { FaChevronLeft, FaChevronRight, FaRedo, FaExclamationTriangle } from "react-icons/fa";
+import CardSkeleton from "../components/CardSkeleton.js";
+import { getErrorMessage, classifyError } from "../utils/apiUtils";
 
 import leftCircle from "../assets/images/lefteclipse.png";
 import rightCircle from "../assets/images/righteclipse.png";
@@ -39,6 +40,8 @@ const Home = () => {
   const [casinos, setCasinos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [errorType, setErrorType] = useState("");
+  const [retrying, setRetrying] = useState(false);
   const [activeSection, setActiveSection] = useState("casinos");
 
   // Filtered casino states
@@ -50,6 +53,40 @@ const Home = () => {
   const [certifiedCasinos, setCertifiedCasinos] = useState([]);
   const [hotCasinos, sethotCasinos] = useState([]);
   const [recentCasinos, setRecentCasinos] = useState([]);
+
+  // Function to fetch casinos - defined outside useEffect for reuse
+  const fetchCasinos = useCallback(async (isRetry = false) => {
+    if (isRetry) {
+      setRetrying(true);
+      setError("");
+      setErrorType("");
+    } else {
+      setLoading(true);
+    }
+
+    try {
+      const data = await getCasinos();
+      setCasinos(data);
+
+      // Filter casinos based on tags and properties
+      filterCasinosData(data);
+
+      // Clear any previous errors on success
+      setError("");
+      setErrorType("");
+    } catch (err) {
+      const errorType = classifyError(err);
+      const errorMessage = getErrorMessage(err);
+
+      setError(errorMessage);
+      setErrorType(errorType);
+
+      console.error('Casino loading error:', err);
+    } finally {
+      setLoading(false);
+      setRetrying(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -90,20 +127,6 @@ const Home = () => {
       });
     }
     // Fetch casinos from backend
-    const fetchCasinos = async () => {
-      try {
-        const data = await getCasinos();
-        setCasinos(data);
-
-        // Filter casinos based on tags and properties
-        filterCasinosData(data);
-      } catch (err) {
-        setError(err.message || "Failed to load casinos");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCasinos();
 
     // Cleanup function
@@ -111,7 +134,7 @@ const Home = () => {
       document.body.style.backgroundColor = null;
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [fetchCasinos]);
 
   // Function to filter casinos based on tags and properties
   const filterCasinosData = (casinosData) => {
@@ -226,12 +249,21 @@ const categories = [
   { icon: categoriesImg6, label: "Instant Play", link: "/games/lottery" }, // Create this route if needed
 ];
 
-  const handlePlayClick = (name) => {
-    navigate(`/casinos/${name.toLowerCase().replace(/\s+/g, "-")}`);
+  const handlePlayClick = (name, isNewTab = false) => {
+    const path = `/casinos/${name.toLowerCase().replace(/\s+/g, "-")}`;
+    if (isNewTab) {
+      window.open(path, '_blank');
+    } else {
+      navigate(path);
+    }
   };
 
   const handleSectionChange = (section) => {
     setActiveSection(section);
+  };
+
+  const handleRetry = () => {
+    fetchCasinos(true);
   };
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -271,18 +303,52 @@ const categories = [
     }
   };
 
-  if (loading) {
+  // Show loading state only on initial load, not on retry
+  if (loading && !retrying) {
     return (
       <div className="flex items-center justify-center h-screen bg-black100">
-        <div className="text-white text-2xl">Loading casinos...</div>
+        <div className="text-center">
+          <div className="text-white text-2xl mb-4">Loading casinos...</div>
+          <CardSkeleton />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen bg-black100">
-        <div className="text-red-500 text-2xl">{error}</div>
+      <div className="flex flex-col items-center justify-center h-screen bg-black100 px-4">
+        <div className="text-center max-w-md">
+          <FaExclamationTriangle className="text-red-500 text-6xl mx-auto mb-4" />
+          <div className="text-red-400 text-xl mb-4">{error}</div>
+          <div className="text-gray-400 text-sm mb-6">
+            {errorType === 'network' && "Check your internet connection"}
+            {errorType === 'server' && "The server is temporarily unavailable"}
+            {errorType === 'timeout' && "The request took too long"}
+            {errorType === 'rate_limit' && "Too many requests, please wait"}
+          </div>
+          <button
+            onClick={handleRetry}
+            disabled={retrying}
+            className={`flex items-center justify-center px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+              retrying
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                : 'bg-red-600 hover:bg-red-700 text-white hover:scale-105'
+            }`}
+          >
+            {retrying ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Retrying...
+              </>
+            ) : (
+              <>
+                <FaRedo className="mr-2" />
+                Try Again
+              </>
+            )}
+          </button>
+        </div>
       </div>
     );
   }
@@ -409,13 +475,15 @@ const categories = [
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 m-10 mt-5">
 
          
-              {getCurrentSectionData().map((casino) => (
+              {loading
+      ? Array.from({ length: 5 }).map((_, idx) => <CardSkeleton key={idx} />):getCurrentSectionData().map((casino) => (
                
                   <Card
+                    key={casino._id}
                     name={casino.name}
                     rating={casino.rating}
                     bgImage={casino.logo}
-                    onClick={() => handlePlayClick(casino.name)}
+                    onClick={(isNewTab) => handlePlayClick(casino.name, isNewTab)}
                   />
               
               ))}
@@ -590,12 +658,14 @@ const categories = [
 
           <div className="flex justify-center items-center">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-             {hotCasinos.map((casino) => (
+             {loading
+      ? Array.from({ length: 5 }).map((_, idx) => <CardSkeleton key={idx} />):hotCasinos.map((casino) => (
                
                   <ExpertCard
+                    key={casino._id}
                     name={casino.name}
                     logo={casino.logo}
-                    onClick={() => handlePlayClick(casino.name)}
+                    onClick={(isNewTab) => handlePlayClick(casino.name, isNewTab)}
                   />
               
               ))}
@@ -630,13 +700,14 @@ const categories = [
 
             <div className="flex justify-center items-center">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 m-10 mt-5">
-                {certifiedCasinos.map((casino) => (
+                {loading
+      ? Array.from({ length: 6 }).map((_, idx) => <CardSkeleton key={idx} />):certifiedCasinos.map((casino) => (
                   <Card2
                     key={casino._id}
                     name={casino.name}
                     rating={casino.rating}
                     bgImage={casino.logo}
-                    onClick={() => handlePlayClick(casino.name)}
+                    onClick={(isNewTab) => handlePlayClick(casino.name,isNewTab)}
                   />
                 ))}
                 {certifiedCasinos.length === 0 && (
@@ -670,13 +741,14 @@ const categories = [
 
             <div className="flex justify-center items-center">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 m-10 mt-5">
-                {recentCasinos.map((casino) => (
+                {loading
+      ? Array.from({ length: 5 }).map((_, idx) => <CardSkeleton key={idx} />):recentCasinos.map((casino) => (
                   <Card
                     key={casino._id}
                     name={casino.name}
                     rating={casino.rating}
                     bgImage={casino.logo}
-                    onClick={() => handlePlayClick(casino.name)}
+                    onClick={(isNewTab) => handlePlayClick(casino.name,isNewTab)}
                   />
                 ))}
                 {recentCasinos.length === 0 && (
@@ -723,6 +795,7 @@ const categories = [
                 welcomeBonus={casino.welcomeBonus || "200% Match Bonus"}
                 rating={casino.rating}
                 visits={`${casino.visits || 0}`}
+                editorView={casino.editorView || "Editor's Choice"}
               />
             ))}
           </div>
@@ -733,6 +806,7 @@ const categories = [
               onClick={handlePrevPage}
               disabled={currentPage === 1}
               className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+              aria-label="Previous page"
             >
               <FaChevronLeft className="w-5 h-5 text-white" />
             </button>
@@ -745,6 +819,7 @@ const categories = [
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
               className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+              aria-label="Next page"
             >
               <FaChevronRight className="w-5 h-5 text-white" />
             </button>
